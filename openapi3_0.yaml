@@ -1,0 +1,266 @@
+openapi: 3.0.3
+info:
+  title: Food Delivery App API
+  version: 1.0.0
+  description: API for managing food delivery orders
+
+servers:
+  - url: /api/v1
+
+paths:
+  /restaurants:
+    get:
+      summary: Retrieves a list of restaurants
+      operationId: getRestaurants
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Restaurant'
+  
+  /restaurants/{restaurantId}:
+    get:
+      summary: Retrieves a specific restaurant
+      operationId: getRestaurant
+      parameters:
+        - name: restaurantId
+          in: path
+          description: ID of the restaurant
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+  
+  /orders:
+    post:
+      summary: Creates a new food delivery order
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderInput'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+  
+  /orders/{orderId}:
+    get:
+      summary: Retrieves a specific food delivery order
+      operationId: getOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of the order
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+  
+  /orders/{orderId}/cancel:
+    patch:
+      summary: Cancels a food delivery order
+      operationId: cancelOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of the order
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order cancellation successful
+        '404':
+          description: Order not found
+  
+  /orders/{orderId}/track:
+    get:
+      summary: Tracks the delivery status of an order
+      operationId: trackOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of the order
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderTracking'
+  
+  /clients/{clientId}:
+    get:
+      summary: Retrieves client information
+      operationId: getClient
+      parameters:
+        - name: clientId
+          in: path
+          description: ID of the client
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+  
+  /couriers/{courierId}:
+    get:
+      summary: Retrieves courier information
+      operationId: getCourier
+      parameters:
+        - name: courierId
+          in: path
+          description: ID of the courier
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Courier'
+  
+  /notifications:
+    post:
+      summary: Sends a notification
+      operationId: sendNotification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationInput'
+      responses:
+        '201':
+          description: Notification sent successfully
+        '400':
+          description: Invalid request body
+  
+components:
+  schemas:
+    Restaurant:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        cuisine:
+          type: string
+  
+    OrderInput:
+      type: object
+      properties:
+        restaurantId:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemInput'
+  
+    OrderItemInput:
+      type: object
+      properties:
+        itemId:
+          type: integer
+        quantity:
+          type: integer
+  
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+        restaurant:
+          $ref: '#/components/schemas/Restaurant'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        totalAmount:
+          type: number
+
+    OrderItem:
+      type: object
+      properties:
+        itemId:
+          type: integer
+        itemName:
+          type: string
+        quantity:
+          type: integer
+  
+    OrderTracking:
+      type: object
+      properties:
+        orderId:
+          type: string
+        status:
+          type: string
+        estimatedDeliveryTime:
+          type: string
+  
+    Client:
+      type: object
+      properties:
+        clientId:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+  
+    Courier:
+      type: object
+      properties:
+        courierId:
+          type: string
+        name:
+          type: string
+        vehicleType:
+          type: string
+
+    NotificationInput:
+      type: object
+      properties:
+        recipient:
+          type: string
+          description: The recipient of the notification
+        message:
+          type: string
+          description: The message content of the notification
+
